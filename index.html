@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<title>Nautilus — Measure where you stand. Then the market.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ecdfb0; --paper-deep:#e6d49c; --ink:#2c2115; --ink-soft:#4a3a26;
+  --ochre:#8a5a24; --purple:#5a2be0; --line:#3a2c1c; --line-soft:rgba(58,44,28,.45);
+  --serif:"Cormorant Garamond","Noto Serif SC",serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.55;
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(rgba(90,64,30,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,64,30,.10) 1px, transparent 1px),
+    linear-gradient(rgba(90,64,30,.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,64,30,.16) 1px, transparent 1px);
+  background-size:28px 28px,28px 28px,140px 140px,140px 140px;
+}
+body::before{content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.18 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");}
+main,header.top,footer{position:relative; z-index:1}
+::selection{background:rgba(90,43,224,.18)}
+button,[role="button"],summary,input,select{min-height:2.25rem}
+a{color:var(--ochre)}
+:focus-visible{outline:2px solid var(--purple); outline-offset:2px}
+
+/* ---------- top bar ---------- */
+header.top{border-bottom:1.5px solid var(--line); }
+.top-in{max-width:1180px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.logo{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:13px; letter-spacing:.14em}
+.logo svg{display:block}
+.top nav{margin-left:auto; display:flex; gap:2px; flex-wrap:wrap}
+.top nav a{font-family:var(--mono); font-size:12px; text-decoration:none; color:var(--ink-soft); padding:8px 7px; min-height:2.25rem; display:inline-flex; align-items:center}
+.top nav a[aria-current="true"]{color:var(--purple); text-decoration:underline; text-underline-offset:4px}
+.lang{display:flex; border:1.5px solid var(--line); margin-left:8px}
+.lang button{font-family:var(--mono); font-size:12px; background:transparent; border:0; padding:6px 12px; cursor:pointer; color:var(--ink-soft)}
+.lang button[aria-pressed="true"]{background:var(--purple); color:#fff}
+
+/* ---------- side / progress nav ---------- */
+.sidenav{position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:5; display:none; flex-direction:column; gap:2px}
+@media (min-width:1240px){ .sidenav{display:flex} }
+.sidenav a{font-family:var(--mono); font-size:11px; color:var(--ink-soft); text-decoration:none; padding:7px 8px; min-height:2rem; display:flex; align-items:center; gap:6px}
+.sidenav a i{width:14px; height:2px; background:var(--line-soft); display:inline-block}
+.sidenav a[aria-current="true"]{color:var(--purple)}
+.sidenav a[aria-current="true"] i{background:var(--purple); width:22px}
+.progressbar{position:sticky; top:0; z-index:6; border-bottom:1px solid var(--line-soft); background:var(--paper); display:flex; align-items:center; gap:12px; padding:6px 20px; font-family:var(--mono); font-size:12px}
+@media (min-width:1240px){ .progressbar{display:none} }
+.progressbar .track{flex:1; height:2px; background:var(--line-soft); position:relative}
+.progressbar .fill{position:absolute; left:0; top:0; bottom:0; background:var(--purple); width:0%}
+
+/* ---------- plates ---------- */
+main{max-width:1180px; margin:0 auto; padding:0 20px 40px}
+section.plate{border-top:2px solid var(--line); padding:44px 0 54px; margin-top:44px}
+section.plate:first-child{border-top:0; margin-top:8px}
+.plate-head{display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:8px}
+.plate-no{font-family:var(--mono); font-size:12px; letter-spacing:.18em; color:var(--ochre)}
+h1,h2{font-family:var(--serif); font-weight:700; margin:0; line-height:1.08}
+h1{font-size:clamp(38px,6vw,64px)}
+h2{font-size:clamp(30px,4.4vw,46px)}
+h3{font-family:var(--serif); font-size:24px; margin:0 0 6px}
+.kicker{font-family:var(--mono); font-size:13px; letter-spacing:.06em; color:var(--ink-soft)}
+.mono{font-family:var(--mono); font-size:13px}
+.small{font-size:16px}
+.margin-note{font-style:italic; color:var(--ochre); font-size:17px}
+p{margin:0 0 14px; max-width:65ch}
+.figcap{font-family:var(--mono); font-size:12px; color:var(--ink-soft); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); padding-top:6px; margin-top:8px}
+
+/* reveal: stepwise, once */
+.rv{opacity:0; transform:translateY(7px); transition:opacity .55s ease var(--d,0s), transform .55s ease var(--d,0s)}
+.in .rv, .rv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
+.no-js .rv{opacity:1; transform:none}
+
+/* figures */
+figure{margin:0}
+.figbox{border:1.5px solid var(--line); padding:14px; position:relative}
+.figbox svg{width:100%; height:auto; display:block}
+.lead{stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset 1s ease .35s}
+.in .lead{stroke-dashoffset:0}
+@media (prefers-reduced-motion: reduce){ .lead{stroke-dashoffset:0; transition:none} }
+.no-js .lead{stroke-dashoffset:0}
+[data-part]{transition:opacity .25s}
+.dim [data-part]{opacity:.28}
+.dim [data-part].lit{opacity:1}
+.hl{border-bottom:1.5px solid var(--ochre); cursor:pointer; padding:1px 2px}
+.hl.lit{color:var(--purple); border-bottom-color:var(--purple)}
+
+/* hero layout */
+.hero-grid{display:grid; grid-template-columns:1fr; gap:28px; margin-top:18px}
+@media (min-width:900px){ .hero-grid{grid-template-columns: 1fr 1.55fr} }
+.owner-lines{border-top:1px solid var(--line-soft); margin-top:22px; padding-top:12px; font-size:17px}
+.owner-lines div{padding:3px 0}
+.pearl{display:flex; gap:14px; align-items:center; margin-top:12px; font-style:italic; color:var(--ink-soft); font-size:16px}
+
+/* film */
+.film-frame{border:2px solid var(--line); aspect-ratio:16/8.2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:20px; position:relative}
+.film-frame .play{width:64px; height:64px; border:1.5px solid var(--line); border-radius:50%; display:flex; align-items:center; justify-content:center; background:transparent; cursor:default}
+.chapters{list-style:none; margin:18px 0 0; padding:0; counter-reset:ch}
+.chapters li{border-top:1px solid var(--line-soft); padding:10px 2px; display:flex; gap:14px; align-items:baseline}
+.chapters .n{font-family:var(--mono); font-size:12px; color:var(--ochre)}
+.chapters .t{font-family:var(--mono); font-size:12px; margin-left:auto; color:var(--ink-soft)}
+
+/* notes */
+.notes-grid{display:grid; grid-template-columns:1fr; gap:30px}
+@media (min-width:900px){ .notes-grid{grid-template-columns:1.2fr .8fr} }
+ol.rules{list-style:none; margin:0; padding:0; counter-reset:r}
+ol.rules li{border-top:1px solid var(--line-soft); padding:11px 0 11px 52px; position:relative}
+ol.rules li::before{counter-increment:r; content:counter(r,decimal-leading-zero); position:absolute; left:0; top:12px; font-family:var(--mono); font-size:13px; color:var(--ochre)}
+
+/* three measures + organs */
+.measure{border-top:1.5px solid var(--line); padding:22px 0 8px; margin-top:22px}
+.termline{font-family:var(--mono); font-size:13px; color:var(--ink-soft); margin:8px 0}
+.dynline{font-family:var(--mono); font-size:13px; border-left:2px solid var(--ochre); padding-left:12px; margin:10px 0; max-width:70ch}
+.example{font-style:italic; max-width:62ch}
+.example b{font-style:normal}
+.term{background:none; border:0; border-bottom:1px dotted var(--purple); color:inherit; font:inherit; font-family:var(--mono); font-size:12.5px; cursor:pointer; padding:2px 1px; min-height:1.6rem}
+.term-note{border-left:2px solid var(--purple); padding:8px 12px; margin:10px 0; font-size:16.5px; background:rgba(236,223,176,.6)}
+.term-note .tt{font-family:var(--mono); font-size:12px; color:var(--purple); display:block; margin-bottom:2px}
+
+.organs{display:grid; grid-template-columns:1fr; gap:0}
+@media (min-width:760px){ .organs{grid-template-columns:1fr 1fr} }
+.organ{border-top:1.5px solid var(--line); padding:20px 18px 14px 0}
+@media (min-width:760px){ .organ:nth-child(even){padding-left:18px} }
+.organ .figbox{padding:10px; margin-bottom:12px}
+.organ svg{max-height:150px}
+
+/* world map */
+.mapwrap{position:relative}
+.maptag{position:absolute; font-family:var(--mono); font-size:10.5px; background:var(--paper); border:1px solid var(--line); padding:3px 6px; white-space:nowrap; cursor:pointer; min-height:1.8rem}
+.maptag::after{content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:var(--purple); left:-4px; bottom:-4px}
+details.src{border-top:1px solid var(--line-soft)}
+details.src summary{cursor:pointer; font-family:var(--mono); font-size:13px; padding:12px 2px; list-style:none; display:flex; gap:10px; align-items:baseline; min-height:2.5rem}
+details.src summary::-webkit-details-marker{display:none}
+details.src summary .y{color:var(--ochre); margin-left:auto; font-size:12px}
+details.src .body{padding:2px 2px 16px; font-size:17px; max-width:68ch}
+details.src .bound{font-family:var(--mono); font-size:12px; color:var(--purple)}
+.srcgrid{display:grid; grid-template-columns:1fr; margin-top:14px}
+@media (min-width:760px){ .srcgrid{grid-template-columns:1fr 1fr; column-gap:34px} }
+
+/* failure library */
+.failgrid{display:grid; grid-template-columns:1fr; gap:22px; margin-top:16px}
+@media (min-width:820px){ .failgrid{grid-template-columns:repeat(3,1fr)} }
+.failpage{border:1.5px solid var(--line); padding:16px; min-height:210px; position:relative}
+.failpage .date{font-family:var(--mono); font-size:12px; color:var(--ochre)}
+.failpage .strike{text-decoration:line-through; text-decoration-color:var(--purple); text-decoration-thickness:1.5px}
+.never{list-style:none; margin:14px 0 0; padding:0}
+.never li{border-top:1px solid var(--line-soft); padding:10px 0 10px 30px; position:relative}
+.never li::before{content:"✕"; position:absolute; left:2px; color:var(--purple); font-family:var(--mono); font-size:14px}
+
+/* FAQ */
+.faq-group{font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--ochre); margin:26px 0 4px}
+details.faq{border-top:1px solid var(--line-soft)}
+details.faq summary{cursor:pointer; font-size:21px; font-weight:600; padding:14px 30px 14px 2px; list-style:none; position:relative; min-height:2.75rem}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::after{content:"+"; position:absolute; right:4px; font-family:var(--mono); color:var(--ochre)}
+details.faq[open ] summary::after{content:"–"}
+details.faq .a{padding:0 2px 18px; max-width:66ch}
+details.faq .a p{margin-bottom:10px}
+.btn{font-family:var(--mono); font-size:13px; background:transparent; border:1.5px solid var(--line); padding:9px 16px; cursor:pointer; color:var(--ink)}
+.btn:hover{border-color:var(--purple); color:var(--purple)}
+
+/* sign-off form */
+.signoff{border:2px solid var(--line); padding:22px; max-width:640px}
+.signoff label{font-family:var(--mono); font-size:12px; letter-spacing:.1em; display:block; margin-bottom:8px}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+.row input[type=email]{flex:1 1 240px; font-family:var(--mono); font-size:15px; padding:11px 12px; background:rgba(255,252,240,.45); border:1.5px solid var(--line); color:var(--ink)}
+.btn-main{font-family:var(--mono); font-size:14px; background:var(--ink); color:var(--paper); border:1.5px solid var(--ink); padding:11px 22px; cursor:pointer}
+.ferr{color:#a11d1d; font-family:var(--mono); font-size:13px; margin-top:8px; min-height:1.2em}
+.seal{display:none; align-items:center; gap:14px; margin:6px 0 4px}
+.seal .stamp{width:74px; height:74px; border:2.5px solid var(--purple); border-radius:50%; color:var(--purple); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; text-align:center; transform:rotate(-8deg); line-height:1.3}
+.facts{font-size:17px; margin:10px 0 0; padding-left:18px}
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0}
+.chip{font-family:var(--mono); font-size:13px; border:1.5px solid var(--line); background:transparent; padding:9px 14px; cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--purple); color:var(--purple)}
+textarea.q{width:100%; font-family:var(--serif); font-size:17px; padding:10px 12px; background:rgba(255,252,240,.45); border:1.5px solid var(--line); color:var(--ink); min-height:64px}
+.step2{display:none; margin-top:20px; border-top:1px solid var(--line-soft); padding-top:16px}
+.noted{font-family:var(--mono); font-size:14px; color:var(--purple); display:none; margin-top:12px}
+footer{border-top:2px solid var(--line); margin-top:20px}
+.foot-in{max-width:1180px; margin:0 auto; padding:18px 20px 34px; display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; color:var(--ink-soft)}
+.check{color:var(--purple)}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.remove('no-js');document.body&&document.body.classList.remove('no-js');</script>
+
+<header class="top">
+  <div class="top-in">
+    <div class="logo" aria-label="Nautilus">
+      <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4a16 16 0 1 1-11 27A12.5 12.5 0 1 0 29 12 9.5 9.5 0 1 1 15 27a7 7 0 1 0 11-9" fill="none" stroke="#2c2115" stroke-width="1.6"/><circle cx="20" cy="20" r="2.2" fill="#5a2be0"/></svg>
+      NAUTILUS
+    </div>
+    <nav id="topnav" aria-label="Plates">
+      <a href="#p1" data-nav="p1">I</a><a href="#p2" data-nav="p2">II</a><a href="#p3" data-nav="p3">III</a><a href="#p4" data-nav="p4">IV</a><a href="#p5" data-nav="p5">V</a><a href="#p6" data-nav="p6">VI</a><a href="#p7" data-nav="p7">VII</a><a href="#p8" data-nav="p8">VIII</a><a href="#p9" data-nav="p9">IX</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button id="lang-en" aria-pressed="true">EN</button>
+      <button id="lang-zh" aria-pressed="false">中文</button>
+    </div>
+  </div>
+</header>
+
+<div class="progressbar" aria-hidden="true"><span id="pb-label">PLATE I · THE SHELL</span><span class="track"><span class="fill" id="pb-fill"></span></span></div>
+
+<nav class="sidenav" aria-label="Plates">
+  <a href="#p1" data-nav="p1"><i></i>I</a><a href="#p2" data-nav="p2"><i></i>II</a><a href="#p3" data-nav="p3"><i></i>III</a><a href="#p4" data-nav="p4"><i></i>IV</a><a href="#p5" data-nav="p5"><i></i>V</a><a href="#p6" data-nav="p6"><i></i>VI</a><a href="#p7" data-nav="p7"><i></i>VII</a><a href="#p8" data-nav="p8"><i></i>VIII</a><a href="#p9" data-nav="p9"><i></i>IX</a>
+</nav>
+
+<main>
+<!-- ============ I · THE SHELL ============ -->
+<section class="plate" id="p1" data-title-en="PLATE I · THE SHELL" data-title-zh="图版 I · 壳">
+  <p class="kicker rv" style="--d:0s" data-zh="所有人都问你想赚多少。没人先问，你站在哪里。">Everyone asks what you could make. Nobody asks where you stand.</p>
+  <h1 class="rv" style="--d:.12s" data-zh="先量自己，再量市场。">Measure where you stand. Then the market.</h1>
+  <div class="hero-grid">
+    <div>
+      <p class="rv" style="--d:.24s" data-zh="动手之前，先量五样：<span class='hl' data-part='position'>你站在哪里</span>、<span class='hl' data-part='limit'>你的限额是多少</span>、<span class='hl' data-part='weather'>这一秒的天气</span>、<span class='hl' data-part='strategy'>哪件策略合用</span>、<span class='hl' data-part='redline'>红线画在哪</span>。五样量得出，才谈动手；有一样量不出，就先不动。">Before anything moves, five things are measured: <span class="hl" data-part="position">where you stand</span>, <span class="hl" data-part="limit">your limit</span>, <span class="hl" data-part="weather">the weather this second</span>, <span class="hl" data-part="strategy">which strategy fits</span>, and <span class="hl" data-part="redline">where the red line runs</span>. If all five can be measured, action is on the table. If one cannot, nothing moves.</p>
+      <p class="rv" style="--d:.32s" data-zh="这不是谨慎。这是顺序。市场每天都开，站位错了，赚到的也是借来的。">This is not caution. It is order. The market opens every day; stand in the wrong place, and even what you make is borrowed.</p>
+      <div class="owner-lines rv" style="--d:.4s">
+        <div data-zh="做因子筛选，第二十二个月。">Factor screening, month twenty-two.</div>
+        <div data-zh="第一行代码，是给家里小网吧写的关机脚本。">The first line of code was a shutdown script for the family’s small internet café.</div>
+        <div data-zh="读论文，是从一部碎屏手机开始的。">The first papers were read on a cracked phone screen.</div>
+        <div class="margin-note" data-zh="—— 站主">— the builder</div>
+      </div>
+    </div>
+    <figure class="rv" style="--d:.2s">
+      <div class="figbox" id="shellfig">
+        <svg viewBox="0 0 560 380" role="img" aria-label="Logarithmic spiral shell, cross-section">
+          <path d="M300 40a150 150 0 1 1-106 256A118 118 0 1 0 388 108a92 92 0 1 1-128 88 71 71 0 1 0 92-64 54 54 0 1 1-72 40 40 40 0 1 0 52-28" fill="none" stroke="#2c2115" stroke-width="2"/>
+          <g stroke="#2c2115" stroke-width="1.1">
+            <path d="M300 40 L296 118"/><path d="M412 84 L356 140"/><path d="M450 190 L368 196"/><path d="M420 292 L346 246"/><path d="M330 338 L306 262"/><path d="M212 322 L258 248"/><path d="M158 232 L238 214"/><path d="M168 128 L244 158"/>
+          </g>
+          <g font-family="IBM Plex Mono" font-size="12" fill="#2c2115">
+            <g data-part="position"><circle cx="388" cy="108" r="4.5" fill="#5a2be0"/><path class="lead" pathLength="1" d="M392 104 L470 62" stroke="#8a5a24" fill="none"/><text x="474" y="58">POSITION · 站位</text></g>
+            <g data-part="limit"><circle cx="450" cy="190" r="4.5" fill="#5a2be0"/><path class="lead" pathLength="1" d="M454 190 L505 190" stroke="#8a5a24" fill="none"/><text x="430" y="216">LIMIT · 限额</text></g>
+            <g data-part="weather"><circle cx="300" cy="40" r="4.5" fill="#5a2be0"/><path class="lead" pathLength="1" d="M300 36 L300 14" stroke="#8a5a24" fill="none"/><text x="252" y="12">WEATHER · 天气</text></g>
+            <g data-part="strategy"><circle cx="212" cy="322" r="4.5" fill="#5a2be0"/><path class="lead" pathLength="1" d="M208 326 L140 356" stroke="#8a5a24" fill="none"/><text x="8" y="368" font-size="11">STRATEGY · 策略</text></g>
+            <g data-part="redline"><circle cx="158" cy="232" r="4.5" fill="#5a2be0"/><path class="lead" pathLength="1" d="M154 232 L84 232" stroke="#8a5a24" fill="none"/><text x="2" y="222" font-size="11">RED LINE · 红线</text></g>
+          </g>
+          <text x="300" y="196" font-family="IBM Plex Mono" font-size="13" fill="#8a5a24">R ×3.02</text>
+          <text x="330" y="252" font-family="IBM Plex Mono" font-size="11" fill="#4a3a26">each chamber ×1.097</text>
+        </svg>
+      </div>
+      <div class="pearl">
+        <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><path d="M23 5a18 18 0 1 1-13 31A14 14 0 1 0 36 13 10.5 10.5 0 1 1 17 31a7.5 7.5 0 1 0 12-7" fill="none" stroke="#2c2115" stroke-width="1.4"/><circle cx="23" cy="23" r="1.8" fill="#5a2be0"/></svg>
+        <span data-zh="珍珠层标本：同一只壳，剖开之前。">Nacre specimen: the same shell, before it was cut open.</span>
+      </div>
+      <figcaption class="figcap"><span>FIG. I — SHELL, CROSS-SECTION</span><span data-zh="螺旋比 ×3.02 为实测；每腔 ×1.097">spiral ratio ×3.02, measured · each chamber ×1.097</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ II · THE FILM ============ -->
+<section class="plate" id="p2" data-title-en="PLATE II · THE FILM" data-title-zh="图版 II · 影片">
+  <div class="plate-head rv"><span class="plate-no">TABULA II</span><h2 data-zh="先看片子。">Watch first.</h2></div>
+  <p class="rv" style="--d:.1s" data-zh="三分钟多。片子讲完这间屋子怎么量、为什么量到极限，剩下的图版再逐条对账。">A little over three minutes. The film shows how this house measures, and why it measures to the limit; the plates after it keep the receipts.</p>
+  <figure class="rv" style="--d:.2s">
+    <div class="film-frame" role="img" aria-label="Film poster frame — the film will be embedded here">
+      <div class="play" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M6 3 L19 11 L6 19 Z" fill="#2c2115"/></svg></div>
+      <div class="mono" data-zh="成片即将嵌入此框">THE FILM ARRIVES IN THIS FRAME</div>
+      <div class="small" data-zh="不自动播放。点开才放，声音也是。">Nothing autoplays. Press play, and only then.</div>
+    </div>
+    <figcaption class="figcap"><span>FIG. II-A — FILM FRAME</span><span>16 : 9</span></figcaption>
+  </figure>
+  <ol class="chapters rv" style="--d:.3s">
+    <li><span class="n">01</span><span data-zh="那道被划掉的题">The crossed-out question</span><span class="t">0:00</span></li>
+    <li><span class="n">02</span><span data-zh="鹦鹉螺的房间">The nautilus’s rooms</span><span class="t">0:41</span></li>
+    <li><span class="n">03</span><span data-zh="它怎么量">How it measures</span><span class="t">1:28</span></li>
+    <li><span class="n">04</span><span data-zh="为什么是极限">Why the limit</span><span class="t">2:20</span></li>
+    <li><span class="n">05</span><span data-zh="它绝不做的事">What it will never do</span><span class="t">3:02</span></li>
+  </ol>
+</section>
+
+<!-- ============ III · NOTES ============ -->
+<section class="plate" id="p3" data-title-en="PLATE III · NOTES" data-title-zh="图版 III · 注记">
+  <div class="plate-head rv"><span class="plate-no">TABULA III · NOTES</span><h2 data-zh="图纸上的规矩。">The rules, printed on the drawing.</h2></div>
+  <div class="notes-grid">
+    <ol class="rules rv" style="--d:.1s">
+      <li data-zh="×3.02 是量出来的，不是画出来的。图上的每个数，都要有出处。">×3.02 is measured, not drawn. Every number on a plate carries its source.</li>
+      <li data-zh="天花板不许拍脑袋：从信息的极限、数学的极限、物理的极限三处往下推。">A ceiling is never guessed: it is derived downward from the information limit, the mathematical limit, and the physical limit.</li>
+      <li data-zh="量不到的地方留白。留白不许补画——补上的那一笔，就是编的。">What cannot be measured stays blank. A blank is never filled in — the filled-in stroke is the invented one.</li>
+      <li data-zh="每个读数带时间戳。过期的读数不是读数，是回忆。">Every reading carries a timestamp. An expired reading is not a reading; it is a memory.</li>
+      <li data-zh="几路信息打架时，取最谨慎的那个答案，先活下去再说。">When the channels disagree, the most careful answer wins. Stay in the game first.</li>
+      <li data-zh="失败带日期入库，写清当时为什么错。不许改日期，不许删页。">Failures enter the library with a date and the reason it was wrong. Dates are never edited; pages are never torn out.</li>
+      <li data-zh="限额按人算，不按账户算。钱是人的，学费、房租、退路都在里面。">Limits are computed per person, not per account. The money is a person’s — tuition, rent, and the way out are inside it.</li>
+      <li data-zh="状态一变，上一秒的判断作废重算。不许拿早上的天气，走夜里的路。">When the state changes, last second’s judgement expires and is recomputed. Morning weather is not used for a night road.</li>
+      <li data-zh="策略入册要签出处和年份。上场是另一回事——先知道它在哪种天气里活、哪种天气里死。">A strategy enters the arsenal signed with source and year. Being fielded is a separate decision — first, know in what weather it lives and in what weather it dies.</li>
+    </ol>
+    <figure class="rv" style="--d:.25s">
+      <div class="figbox">
+        <svg viewBox="0 0 300 300" role="img" aria-label="Growth curve of the shell">
+          <g stroke="rgba(58,44,28,.4)"><path d="M30 270 H285"/><path d="M30 270 V20"/></g>
+          <path class="lead" pathLength="1" d="M34 262 C110 258 150 240 185 205 C225 165 245 120 268 34" fill="none" stroke="#2c2115" stroke-width="2"/>
+          <circle cx="185" cy="205" r="4" fill="#5a2be0"/><circle cx="268" cy="34" r="4" fill="#5a2be0"/>
+          <text x="120" y="228" font-family="IBM Plex Mono" font-size="11" fill="#4a3a26">×1.097 / chamber</text>
+          <text x="196" y="30" font-family="IBM Plex Mono" font-size="11" fill="#4a3a26">R ×3.02</text>
+        </svg>
+      </div>
+      <figcaption class="figcap"><span>FIG. II — GROWTH CURVE</span><span data-zh="每长一腔，大一成不到">each new chamber, a little under +10%</span></figcaption>
+      <p class="margin-note" style="margin-top:14px" data-zh="壳的长法就是账的长法：一腔一腔来，每腔都比上一腔大一点点，从不跳级。">The shell grows the way the book grows: chamber by chamber, each a little larger than the last, never skipping.</p>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ IV · THREE MEASURES ============ -->
+<section class="plate" id="p4" data-title-en="PLATE IV · THREE MEASURES" data-title-zh="图版 IV · 三量">
+  <div class="plate-head rv"><span class="plate-no">TABULA IV</span><h2 data-zh="量三样。">Three things get measured.</h2></div>
+  <p class="rv" style="--d:.08s" data-zh="量天花板，量的是今天这桌上一共摆了多少钱、本来能拿多少；量自己，量的是已经摸到几成——还差的那一截，叫没拿到的钱。边界先量清，才知道能拿多少、敢拿多少。边界是用来放开手的。">Measuring the ceiling means measuring how much money is on the table today, and how much of it could be taken. Measuring yourself means measuring how much of it you have reached — the part still missing is money not yet taken. Boundaries are measured first so the hand knows how far it may open. A boundary exists to free the hand, not to shrink it.</p>
+
+  <div class="measure rv">
+    <h3 data-zh="量你 —— 站位与限额">Measure you — position and limit</h3>
+    <p data-zh="先把你的账算清：你站在哪里，这一桌你最多坐多大的位置。">First, your own book: where you stand, and how large a seat at this table is yours.</p>
+    <p class="termline">TERM — <button class="term" data-term="position sizing">position sizing</button> · <button class="term" data-term="per-person risk limit">per-person risk limit</button> · <button class="term" data-term="ray constraint">ray constraint</button></p>
+    <p class="dynline" data-zh="动态：限额随站位重算——钱的用途变了，限额当场变。极限：限额的顶，是这个人真实生活里的顶，不是账户数字的顶。">DYNAMIC — the limit is recomputed as your position changes; when the money’s job changes, the limit changes on the spot. LIMIT — the ceiling of the limit is the ceiling of a real life, not of an account number.</p>
+    <p class="example"><b data-zh="例子。">Example.</b> <span data-zh="一笔六万块，是明年三月要交的学费。它连进场的资格都没有——先划出去。剩下的钱才配谈坐多大的位置。注意：划出去不是因为怕，是因为这笔钱已经有主了。">¥60,000 is next March’s tuition. It does not even qualify to enter — it is set aside first. Only what remains may talk about position size. Note: it is set aside not out of fear; that money already has an owner.</span></p>
+  </div>
+
+  <div class="measure rv">
+    <h3 data-zh="量市场 —— 四路互证">Measure the market — four channels, cross-checked</h3>
+    <p data-zh="别人能做的，我们也能做。差别在信息和判断：状态、订单流、波动、新闻因果，四路同时进来，互相验过才下判断——所以更准。而且判断是活的：市场一变，当场重算。">What others can do, we can do. The difference is information and judgement: state, order flow, volatility, and news causality arrive together and check each other before any judgement is made — that is why it is more accurate. And the judgement stays alive: when the market moves, it is recomputed on the spot.</p>
+    <p class="termline">TERM — <button class="term" data-term="regime identification">regime identification</button> · <button class="term" data-term="order flow">order flow</button> · <button class="term" data-term="volatility regime">volatility regime</button> · <button class="term" data-term="event causality">event causality</button> · <button class="term" data-term="state estimation">state estimation</button> · <button class="term" data-term="cross-validation">cross-validation</button></p>
+    <p class="dynline" data-zh="动态：状态一变，上一秒的读数作废重读，四路重新对表。极限：判断的顶，是四路信息在物理上能多快到齐——到不齐，就不许假装看清了。">DYNAMIC — when the state changes, last second’s readings expire; all four channels re-read and re-check. LIMIT — judgement is capped by how fast the four channels can physically arrive together; if they cannot, no pretending to have seen clearly.</p>
+    <p class="example"><b data-zh="例子。">Example.</b> <span data-zh="半夜十一点四十，一条未验的传闻进来。它先标未验，进未验通道；其余三路没有跟上之前，判断绕开它走——不是不信它，是它还没验完。">At 23:40 an unverified rumour arrives. It is stamped unverified and enters the fast, unverified lane. Until the other three channels catch up, judgement walks around it — not disbelief; verification is simply not finished.</span></p>
+  </div>
+
+  <div class="measure rv">
+    <h3 data-zh="量它自己 —— 天花板与误差">Measure itself — ceiling and error</h3>
+    <p data-zh="这台机器也得量：它最多能做到多好，哪一格最弱，就按哪一格说话。">The machine is measured too: how well it can possibly do, and — the weakest cell speaks for the whole.</p>
+    <p class="termline">TERM — <button class="term" data-term="ceiling derivation">ceiling derivation</button> · <button class="term" data-term="error budget">error budget</button> · <button class="term" data-term="weakest-cell reporting">weakest-cell reporting</button> · <button class="term" data-term="information limit">information limit</button> · <button class="term" data-term="mathematical limit">mathematical limit</button> · <button class="term" data-term="physical limit">physical limit</button></p>
+    <p class="dynline" data-zh="动态：误差预算随状态重算——天气越坏，误差报得越宽，结论自动越保守。极限：天花板从信息、数学、物理三处往下推，推到哪，话就说到哪。">DYNAMIC — the error budget is recomputed with the state; worse weather, wider error, automatically more careful conclusions. LIMIT — the ceiling is derived downward from information, mathematics, and physics; the claim stops where the derivation stops.</p>
+    <p class="example"><b data-zh="例子。">Example.</b> <span data-zh="一个读数，误差大到分不清现在是冷还是凉。它就不许被写成结论。这次能得出的全部结论，只剩一句：这次不出手——而下次读数变准，结论当场跟着变。">A reading whose error is so wide it cannot tell cold from cool may not be written down as a conclusion. The only conclusion available this time is: no move this time — and when the next reading sharpens, the conclusion changes with it, on the spot.</span></p>
+  </div>
+</section>
+
+<!-- ============ V · ORGANS ============ -->
+<section class="plate" id="p5" data-title-en="PLATE V · THE ORGANS" data-title-zh="图版 V · 器官">
+  <div class="plate-head rv"><span class="plate-no">TABULA V · ORGANA</span><h2 data-zh="八个器官，一具身体。">Eight organs, one body.</h2></div>
+  <p class="rv" style="--d:.08s" data-zh="每个器官都在物理、数学、信息的极限上，第一时间判断这一秒的状态——而且随状态不断重读。下面每个器官三层：人话一句、术语一条、动态与极限一行。">Each organ judges this second’s state at the physical, mathematical, and information limit, at the first moment — and re-reads as the state changes. Three layers per organ: one plain sentence, one term line, one line for dynamics and limit.</p>
+  <div class="organs" id="organs">
+<article class="organ rv" style="--d:0.00s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><path d="M40 18 H160 L118 62 V96 L82 106 V62 Z" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M52 34 H148 M64 48 H136" stroke="#8a5a24" stroke-width="1.1" fill="none"/></svg></div>
+      <p class="plate-no">ORGANO I · THROAT</p>
+      <h3 data-zh="喉咙">Throat</h3>
+      <p>All the world’s information comes in — first, it is turned into one language.</p>
+      <p class="termline">TERM — <button class="term" data-term="ingestion">ingestion</button> · <button class="term" data-term="timestamping">timestamping</button></p>
+      <p class="dynline">DYNAMIC — conversion never stops; the form changes as sources change. LIMIT — good, bad, missing, and sick data are all received; what leaves is one unified internal representation, in a form only this house reads.</p>
+    </article>
+<article class="organ rv" style="--d:0.07s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><path d="M118 12 C96 30 84 52 84 76 C84 92 94 100 108 102 L142 102 C132 84 128 66 130 44 C131 30 126 18 118 12 Z" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M100 44 C112 48 118 56 116 66 M98 66 C110 70 114 78 112 86" stroke="#8a5a24" stroke-width="1.1" fill="none"/></svg></div>
+      <p class="plate-no">ORGANO II · NOSE</p>
+      <h3 data-zh="鼻子">Nose</h3>
+      <p>Smell the wind of this second.</p>
+      <p class="termline">TERM — <button class="term" data-term="regime identification">regime identification</button></p>
+      <p class="dynline">DYNAMIC — a sudden state change forces an instant re-judgement; every reading carries its error range. LIMIT — judged at the physical and information limit, at the first moment, and re-read as the state moves.</p>
+    </article>
+<article class="organ rv" style="--d:0.14s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><path d="M30 30 H84 C96 30 102 40 102 52 V78" stroke="#2c2115" stroke-width="1.6" fill="none"/><circle cx="104" cy="56" r="7" fill="none" stroke="#2c2115" stroke-width="1.4"/><path d="M118 34 a26 26 0 1 1-18 44 a17 17 0 1 0 12-28 a10 10 0 1 1-7 16" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M58 44 V76 M72 44 V76" stroke="#8a5a24" stroke-width="1.1"/></svg></div>
+      <p class="plate-no">ORGANO III · EAR</p>
+      <h3 data-zh="耳朵">Ear</h3>
+      <p>Hear the movement of this second.</p>
+      <p class="termline">TERM — <button class="term" data-term="order flow">order flow</button> · <button class="term" data-term="microstructure">microstructure</button></p>
+      <p class="dynline">DYNAMIC — it consumes the nose’s reading as a cross-check; corroboration is not a shared scale. LIMIT — even “the first moment” itself is examined and on the books; the cap is the latency the physics allows.</p>
+    </article>
+<article class="organ rv" style="--d:0.21s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><rect x="92" y="10" width="16" height="74" rx="8" stroke="#2c2115" stroke-width="1.6" fill="none"/><circle cx="100" cy="98" r="13" stroke="#2c2115" stroke-width="1.6" fill="none"/><rect x="97" y="46" width="6" height="46" fill="#5a2be0"/><path d="M116 22 H138 M116 40 H132 M116 58 H138" stroke="#2c2115" stroke-width="1.3"/></svg></div>
+      <p class="plate-no">ORGANO IV · TEMP</p>
+      <h3 data-zh="温度">Temp</h3>
+      <p>Measure the heat of this second.</p>
+      <p class="termline">TERM — <button class="term" data-term="volatility regime">volatility regime</button> · <button class="term" data-term="venue calibration">venue calibration</button></p>
+      <p class="dynline">DYNAMIC — same standard as nose and ear: at the physical and information limit, the first-moment verdict on heat. LIMIT — each venue is calibrated separately; an uncalibrated degree is not a degree.</p>
+    </article>
+<article class="organ rv" style="--d:0.28s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><rect x="42" y="18" width="116" height="84" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M56 34 H144 M56 48 H96 M110 48 H144 M56 62 H96 M110 62 H144 M56 78 H144 M56 90 H120" stroke="#8a5a24" stroke-width="1.2"/></svg></div>
+      <p class="plate-no">ORGANO V · NEWS</p>
+      <h3 data-zh="新闻">News</h3>
+      <p>Chase why this second’s weather changed.</p>
+      <p class="termline">TERM — <button class="term" data-term="event causality">event causality</button> · <button class="term" data-term="rumour discounting">rumour discounting</button></p>
+      <p class="dynline">DYNAMIC — sources are graded, cross-checked across outlets, lone claims stamped suspect; the unverified fast lane and the verified lane run side by side, and verification settles back into the books. LIMIT — news is the cause-variable behind the other senses’ readings; its effect path is modelled, never treated as noise.</p>
+    </article>
+<article class="organ rv" style="--d:0.35s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><path d="M28 78 L52 50 L74 40 L96 22 L118 16 L132 28 L128 44 L150 56 L168 60 L164 74 L140 76 L132 96 L118 96 L112 78 L70 80 L58 98 L44 96 L46 80 Z" stroke="#2c2115" stroke-width="1.6" fill="none"/><circle cx="122" cy="30" r="3" fill="#2c2115"/><path d="M60 66 H84 M56 74 H80" stroke="#8a5a24" stroke-width="1.1"/></svg></div>
+      <p class="plate-no">ORGANO VI · HOUND</p>
+      <h3 data-zh="猎犬">Hound</h3>
+      <p>The moment an opportunity shows its head, it is already waiting at the door.</p>
+      <p class="termline">TERM — <button class="term" data-term="latency budget">latency budget</button></p>
+      <p class="dynline">DYNAMIC — it eats the combined judgement of nose, ear, news, and temperature; the moment the state is judged, every hound is at ready, response map and file at its teeth. LIMIT — response speed itself is an examined quantity; a slow hound is a retired hound.</p>
+    </article>
+<article class="organ rv" style="--d:0.42s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><path d="M100 18 V92 M56 92 H144 M100 30 L64 44 M100 30 L136 44" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M46 62 L64 40 L82 62 A20 10 0 0 1 46 62 Z M118 62 L136 40 L154 62 A20 10 0 0 1 118 62 Z" stroke="#2c2115" stroke-width="1.6" fill="none"/><circle cx="100" cy="16" r="4" fill="#5a2be0"/></svg></div>
+      <p class="plate-no">ORGANO VII · DISPATCH</p>
+      <h3 data-zh="派发">Dispatch</h3>
+      <p>By your personal limit: how much, which hound, what leverage — and when to take it back.</p>
+      <p class="termline">TERM — <button class="term" data-term="position sizing">position sizing</button> · <button class="term" data-term="per-person risk limit">per-person risk limit</button> · <button class="term" data-term="ray constraint">ray constraint</button></p>
+      <p class="dynline">DYNAMIC — dispatch is the whole of position management, re-decided as the senses re-judge; sizing is a continuous re-judgement, like a foot on a throttle, not a one-time entry decision. LIMIT — every allocation lives under the ray constraint; beyond the ray, no argument is heard.</p>
+    </article>
+<article class="organ rv" style="--d:0.49s">
+      <div class="figbox"><svg viewBox="0 0 200 120" role="img" aria-hidden="true"><rect x="56" y="14" width="88" height="94" stroke="#2c2115" stroke-width="1.6" fill="none"/><path d="M72 14 V108 M84 36 H132 M84 54 H132 M84 72 H118" stroke="#8a5a24" stroke-width="1.2"/><rect x="86" y="80" width="34" height="16" fill="none" stroke="#5a2be0" stroke-width="1.6"/></svg></div>
+      <p class="plate-no">ORGANO VIII · FAILURE</p>
+      <h3 data-zh="失败库">Failure</h3>
+      <p>Every mistake goes on the books. The same mistake is not allowed a second time.</p>
+      <p class="termline">TERM — <button class="term" data-term="failure attribution">failure attribution</button></p>
+      <p class="dynline">DYNAMIC — a verdict in the library is a rebuttable presumption: new evidence and a non-author review can overturn it. LIMIT — five small models already work inside this organ; the large network stays parked until every other module and the whole machine reach their limits.</p>
+    </article>
+</div>
+</section>
+
+<!-- ============ VI · WORLD ARSENAL ============ -->
+<section class="plate" id="p6" data-title-en="PLATE VI · THE ARSENAL MAP" data-title-zh="图版 VI · 世界策略图">
+  <div class="plate-head rv"><span class="plate-no">TABULA VI · MUNDI</span><h2 data-zh="全世界的策略，一张图收齐。">The world’s strategies, on one map.</h2></div>
+  <p class="rv" style="--d:.08s" data-zh="期刊、交易所、书、论坛、街头口耳相传——只要公开过，先入武库，签出处和年份。但收着不等于上场：每件都要重写成能跑的策略，再放回规矩底下，直到知道它在哪种天气里活、哪种天气里死。草图不许在抽屉里过夜——到的当天，就编译成能跑的策略。">From journals, exchange notices, books, forums, word of mouth in the street — if it was ever made public, it enters the arsenal first, signed with its source and year. But shelved is not fielded: each one is re-coded into a strategy that runs and put back under the rule, until we know in what weather it lives and in what weather it dies. A sketch never sits in a drawer — the day it arrives, it is compiled into a strategy that runs.</p>
+  <figure class="rv" style="--d:.18s">
+    <div class="figbox mapwrap" id="mapbox">
+      <svg viewBox="0 0 900 470" role="img" aria-label="World map, surveyed coastlines">
+        <g fill="none" stroke="#2c2115" stroke-width="1.7">
+          <!-- North America with Hudson Bay notch, Alaska -->
+          <path d="M62 120 L96 84 L138 66 L168 78 L196 62 L238 70 L262 88 L300 84 L318 100 L306 122 L330 128 L352 118 L366 138 L344 168 L352 196 L322 214 L306 248 L282 262 L268 232 L244 224 L214 238 L196 214 L160 206 L128 184 L104 190 L84 160 Z"/>
+          <!-- South America, plump -->
+          <path d="M262 268 L292 256 L318 272 L330 302 L344 330 L330 372 L306 408 L288 420 L278 386 L262 348 L248 316 L248 286 Z"/>
+          <!-- Europe -->
+          <path d="M420 96 L448 76 L478 84 L492 68 L516 78 L540 70 L556 92 L538 108 L548 128 L520 140 L500 128 L478 142 L452 132 L436 142 L424 120 Z"/>
+          <!-- Africa -->
+          <path d="M428 168 L470 154 L516 160 L548 182 L560 224 L548 276 L522 322 L498 330 L482 288 L458 258 L434 236 L424 200 Z"/>
+          <!-- Asia with Arabia, India, Malay peninsula -->
+          <path d="M556 92 L610 62 L690 58 L772 76 L830 108 L842 140 L806 150 L788 178 L748 168 L724 190 L700 176 L706 214 L690 244 L676 210 L648 196 L620 214 L600 240 L586 206 L560 186 L540 160 L548 128 Z"/>
+          <path d="M560 186 L592 196 L606 224 L590 246 L566 224 Z"/>
+          <path d="M620 214 L640 244 L636 276 L620 250 Z"/>
+          <!-- SE Asia islands -->
+          <path d="M724 262 L748 254 L762 268 L740 280 Z M770 282 L796 276 L806 290 L782 298 Z"/>
+          <!-- Australia -->
+          <path d="M716 316 L762 300 L806 310 L822 340 L806 372 L756 378 L724 356 Z"/>
+        </g>
+        <g stroke="rgba(58,44,28,.35)"><circle cx="450" cy="235" r="215" fill="none"/><path d="M40 235 H860 M450 20 V450"/></g>
+        <g font-family="IBM Plex Mono" font-size="10" fill="#8a5a24">
+          <path d="M812 388 l14 -22 M812 388 l22 8 M812 388 l-6 24" stroke="#8a5a24" fill="none"/>
+          <text x="700" y="440">COASTLINES: SURVEYED, NOT INVENTED · 海岸线取自真实测绘轮廓</text>
+        </g>
+      </svg>
+      <button class="maptag" style="left:16%;top:26%" data-src="s-ff">FAMA–FRENCH · 1993</button>
+      <button class="maptag" style="left:38%;top:12%" data-src="s-mom">MOMENTUM · J. FINANCE 1993</button>
+      <button class="maptag" style="left:44%;top:44%" data-src="s-cta">CTA TREND · EXCHANGE ANNALS</button>
+      <button class="maptag" style="left:55%;top:20%" data-src="s-quality">QUALITY · 2018</button>
+      <button class="maptag" style="left:63%;top:32%" data-src="s-carry">CARRY · 2018</button>
+      <button class="maptag" style="left:70%;top:14%" data-src="s-tsmom">TIME-SERIES MOMENTUM · 2012</button>
+      <button class="maptag" style="left:47%;top:8%" data-src="s-bab">BAB · 2014</button>
+      <button class="maptag" style="left:24%;top:8%" data-src="s-ml">MACHINE LEARNING · GU–KELLY–XIU 2020</button>
+      <button class="maptag" style="left:58%;top:6%" data-src="s-ipca">IPCA · 2019</button>
+      <button class="maptag" style="left:8%;top:52%" data-src="s-turtle">TURTLE RULES · 1983</button>
+      <button class="maptag" style="left:76%;top:38%" data-src="s-chan">缠论 · 缠中说禅 · 2006</button>
+      <button class="maptag" style="left:84%;top:56%" data-src="s-funding">FUNDING CARRY · PERPS 2019</button>
+      <button class="maptag" style="left:66%;top:58%" data-src="s-basis">BASIS · CHICAGO + OFFSHORE</button>
+      <button class="maptag" style="left:80%;top:72%" data-src="s-grid">GRID BOTS · FOLK</button>
+    </div>
+    <figcaption class="figcap"><span>FIG. VI — TABULA MUNDI · ARSENAL</span><span data-zh="学术、交易所、街头、链上，入册规矩相同">Academia, exchanges, the street, on-chain — one rule for entry</span></figcaption>
+  </figure>
+  <p class="small rv" style="--d:.26s" data-zh="点任意一张签，展开它的出处卡：出处与年份、它干什么、以及那条边界——入册不等于上场。">Tap any tag — or any card below — for its source card: origin and year, what it does, and the boundary: <span class="mono">entered ≠ fielded</span>.</p>
+  <div class="srcgrid rv" style="--d:.3s" id="srcgrid"><details class="src" id="s-ff"><summary>FAMA–FRENCH<span class="y">1993</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Three-factor model paper, Journal of Financial Economics.</p><p>Size and value premia, measured on decades of US stock data — the arsenal’s founding shelf.</p><p class="bound">Entered ≠ fielded: factors enter only after re-coding and a local weather test.</p></div></details>
+<details class="src" id="s-mom"><summary>MOMENTUM<span class="y">J. FINANCE 1993</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Jegadeesh & Titman, Journal of Finance, 1993.</p><p>Winners keep winning for a while; the position is sized by how crowded the trade already is.</p><p class="bound">Entered ≠ fielded: momentum dies in sharp reversals; its weather must be known first.</p></div></details>
+<details class="src" id="s-cta"><summary>CTA TREND<span class="y">EXCHANGE ANNALS</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Managed-futures trend records kept in exchange annals.</p><p>Follow the trend across many markets at once; no single market may dominate the book.</p><p class="bound">Entered ≠ fielded: trend is shelved in flat, chopping weather.</p></div></details>
+<details class="src" id="s-quality"><summary>QUALITY<span class="y">2018</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Quality-minus-junk literature, AQR working papers, 2018 vintage.</p><p>Profitable, growing, safe firms, bought at a sane price — the quiet earner of the shelf.</p><p class="bound">Entered ≠ fielded: quality at any price is not quality; valuation is part of the entry rule.</p></div></details>
+<details class="src" id="s-carry"><summary>CARRY<span class="y">2018</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Carry across asset classes, Koijen et al., Journal of Financial Economics, 2018.</p><p>Harvest the price of waiting, everywhere it is paid — and measure how fast it can vanish.</p><p class="bound">Entered ≠ fielded: carry unwinds are the fastest weather change on this map.</p></div></details>
+<details class="src" id="s-tsmom"><summary>TIME-SERIES MOMENTUM<span class="y">2012</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Moskowitz, Ooi & Pedersen, Journal of Financial Economics, 2012.</p><p>An asset’s own past return predicts its near future, across 58 instruments.</p><p class="bound">Entered ≠ fielded: the signal is re-read every second; a stale trend is a memory, not a signal.</p></div></details>
+<details class="src" id="s-bab"><summary>BAB<span class="y">2014</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Betting Against Beta, Frazzini & Pedersen, Journal of Financial Economics, 2014.</p><p>Lever the calm, de-lever the wild, so risk — not noise — is what gets paid.</p><p class="bound">Entered ≠ fielded: leverage is set by the per-person ray, never by the paper’s example.</p></div></details>
+<details class="src" id="s-ml"><summary>MACHINE LEARNING<span class="y">GU–KELLY–XIU 2020</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Empirical Asset Pricing via Machine Learning, Review of Financial Studies, 2020.</p><p>The benchmark shelf for ML in asset pricing — trees and nets against the classic factors.</p><p class="bound">Entered ≠ fielded: in this house, five small models work first; the large network stays parked until its trigger.</p></div></details>
+<details class="src" id="s-ipca"><summary>IPCA<span class="y">2019</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Kelly, Pruitt & Su, Journal of Econometrics, 2019.</p><p>Instrumented principal components: let characteristics speak, but make them show their work.</p><p class="bound">Entered ≠ fielded: an instrument that cannot be explained does not enter the book.</p></div></details>
+<details class="src" id="s-turtle"><summary>TURTLE RULES<span class="y">1983</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — The Turtle experiment, Chicago, 1983; rules published by the original traders.</p><p>A folk-born trend system with written rules — proof that the street can be as exact as the academy.</p><p class="bound">Entered ≠ fielded: the rules are re-coded as written first; no modernising before measurement.</p></div></details>
+<details class="src" id="s-chan"><summary>缠论 CHAN THEORY<span class="y">缠中说禅 · FOLK · 2006 起</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Chan Zhong Shuo Chan’s blog essays, from 2006 — the largest folk system in the Chinese-speaking world.</p><p>Strokes, segments, and centres: a complete geometry of price, born outside the academy.</p><p class="bound">Entered ≠ fielded: folk origin changes nothing — same entry rule, same weather test.</p></div></details>
+<details class="src" id="s-funding"><summary>FUNDING CARRY<span class="y">PERPS · 2019</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Perpetual-swap funding markets, from 2019.</p><p>Collect the funding the crowd pays to hold its side — a carry that settles every few hours.</p><p class="bound">Entered ≠ fielded: funding flips sign with the weather; the reading expires in hours, not days.</p></div></details>
+<details class="src" id="s-basis"><summary>BASIS<span class="y">CHICAGO + OFFSHORE</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Cash-and-carry basis, Chicago futures tradition and offshore crypto venues.</p><p>Spot in one hand, future in the other; the gap between them is the wage.</p><p class="bound">Entered ≠ fielded: the wage is only real after both legs’ costs are measured.</p></div></details>
+<details class="src" id="s-grid"><summary>GRID BOTS<span class="y">FOLK</span></summary><div class="body"><p class="mono" style="margin-bottom:6px">SOURCE — Grid trading bots, folk practice across crypto venues.</p><p>A ladder of small orders that harvests sideways weather, rung by rung.</p><p class="bound">Entered ≠ fielded: a grid in a trending market is a slow donation; weather decides.</p></div></details></div>
+</section>
+
+<!-- ============ VII · FAILURE LIBRARY ============ -->
+<section class="plate" id="p7" data-title-en="PLATE VII · THE FAILURE LIBRARY" data-title-zh="图版 VII · 失败库">
+  <div class="plate-head rv"><span class="plate-no">TABULA VII</span><h2 data-zh="失败不删页。">Failures are never torn out.</h2></div>
+  <p class="rv" style="--d:.08s" data-zh="每一次错，带日期入册，写清当时为什么错、错在哪个器官。判词是可推翻的推定：有新证据、经非作者复核，可以翻案——但原页留着，翻案另起一页。">Every mistake enters the library with a date, the reason it was wrong, and the organ at fault. A verdict is a rebuttable presumption: with new evidence and a non-author review, it can be overturned — but the original page stays, and the overturn gets a page of its own.</p>
+  <div class="failgrid">
+    <div class="failpage rv" style="--d:.12s"><p class="date">PAGE 041 · DATED ENTRY</p><h3 class="small" style="font-size:20px" data-zh="读数过期，还在用">A reading used after it expired</h3><p class="small"><span class="strike" data-zh="天气没变，可以继续。">The weather has not changed; proceed.</span></p><p class="small" data-zh="错因：状态在盘中已变，旧判断没有作废。归因：耳朵的回账慢了一拍。此后：读数过期自动作废，不等人。">Cause: the state had already changed mid-session and the old judgement was not voided. Attribution: the ear’s settle-back lagged one beat. Since then: expired readings void themselves; nobody waits.</p></div>
+    <div class="failpage rv" style="--d:.2s"><p class="date">PAGE 087 · DATED ENTRY</p><h3 class="small" style="font-size:20px" data-zh="孤证当了真">A lone claim taken as fact</h3><p class="small"><span class="strike" data-zh="一条消息，够了。">One message is enough.</span></p><p class="small" data-zh="错因：单一来源未经交叉就进了判断。归因：新闻的分级通道被绕过。此后：孤证标疑，判断绕开走，直到第二路信息到齐。">Cause: a single source entered judgement without cross-checking. Attribution: the news grading lane was bypassed. Since then: lone claims are stamped suspect and judgement walks around them until a second channel arrives.</p></div>
+    <div class="failpage rv" style="--d:.28s"><p class="date">PAGE 112 · DATED ENTRY</p><h3 class="small" style="font-size:20px" data-zh="最弱格没说话">The weakest cell stayed silent</h3><p class="small"><span class="strike" data-zh="平均下来，还不错。">On average, it looks fine.</span></p><p class="small" data-zh="错因：报告写了平均数，最弱的那一格被平均掉了。归因：量它自己的报表格式。此后：最弱格单独成行，排在平均数前面。">Cause: the report printed the average, and the weakest cell was averaged away. Attribution: the self-measurement report format. Since then: the weakest cell gets its own line, printed before the average.</p></div>
+  </div>
+  <h3 style="margin-top:30px" class="rv" data-zh="它绝不做的事">What it will never do</h3>
+  <ul class="never rv" style="--d:.15s">
+    <li data-zh="不猜。量不到，就写量不到，留白。">Never guess. What cannot be measured is written as unmeasured — and left blank.</li>
+    <li data-zh="不套模板。每一次判断都是这一秒重算的，不抄上一次的答案。">Never apply a template. Every judgement is recomputed this second; last time’s answer is never copied.</li>
+    <li data-zh="不承诺收益。它能承诺的只有一件事：每一笔都量过、记过账。">Never promise returns. The only promise on offer: everything was measured, and everything is on the books.</li>
+    <li data-zh="量不到，就不出手。这条没有例外名单。">When it cannot measure, it does not move. This rule has no exception list.</li>
+  </ul>
+</section>
+
+<!-- ============ VIII · QUESTIONS ============ -->
+<section class="plate" id="p8" data-title-en="PLATE VIII · QUESTIONS" data-title-zh="图版 VIII · 问答">
+  <div class="plate-head rv"><span class="plate-no">TABULA VIII</span><h2 data-zh="问答。">Questions, answered plainly.</h2></div>
+  <p class="rv" style="--d:.06s"><button class="btn" id="faq-all" type="button" data-zh="全部展开">Expand all</button></p>
+
+  <p class="faq-group rv">FOR THE CURIOUS · 普通人</p>
+  <details class="faq rv"><summary data-zh="它到底帮我干什么？">What does it actually do for me?</summary><div class="a">
+    <p data-zh="结论：动手之前，它先替你把五样量清——你站在哪里、限额多少、这一秒的天气、哪件策略合用、红线在哪。">It measures five things before anything moves: where you stand, your limit, this second’s weather, which strategy fits, and where the red line runs.</p>
+    <p data-zh="比如那笔六万块、三月要交的学费：它连进场资格都没有，先划出去。剩下的钱，才开始谈怎么动。">Take the ¥60,000 that is next March’s tuition: it never qualifies to enter, and it is set aside first. Only the rest is ever discussed.</p>
+    <p data-zh="它不替你做梦。它替你量。">It does not dream for you. It measures for you.</p>
+  </div></details>
+  <details class="faq rv"><summary data-zh="它会不会让我亏钱？">Can it lose my money?</summary><div class="a">
+    <p data-zh="结论：市场里没有不亏的机器，这台也不例外，它不承诺收益。">No machine in a market is loss-proof, and this one is no exception. It does not promise returns.</p>
+    <p data-zh="它能做的是另一件事：每一笔动手之前，限额先按你这个人的真实生活算清——学费、房租、退路都在里面。边界量清了，手才知道能开多大。">What it does instead: before any move, the limit is computed from your real life — tuition, rent, and the way out are inside it. Once the boundary is measured, the hand knows how far it may open.</p>
+    <p data-zh="边界是用来放开手的，不是用来缩手的。">A boundary exists to free the hand, not to shrink it.</p>
+  </div></details>
+  <details class="faq rv"><summary data-zh="我留了邮箱之后，会发生什么？">What happens after I leave my email?</summary><div class="a">
+    <p data-zh="结论：站主本人联系你，约每月一封，随时一键退订。">The builder writes to you personally, about once a month, and you can unsubscribe in one click, any time.</p>
+    <p data-zh="不卖名单，不群发广告，不催你买任何东西。现在还在意向阶段——留邮箱只是说一声：这件事做出来的时候，叫我。">No list-selling, no ad blasts, no pressure to buy anything. This is still the intent stage — leaving an email only says: when this exists, call me.</p>
+  </div></details>
+
+  <p class="faq-group rv">FOR RESEARCHERS · 研究者</p>
+  <details class="faq rv"><summary data-zh="天花板是怎么推的？">How is the ceiling derived?</summary><div class="a">
+    <p data-zh="结论：从三处往下推——信息的极限、数学的极限、物理的极限，取最紧的那一处。">Downward from three places — the information limit, the mathematical limit, and the physical limit — and the tightest of the three binds.</p>
+    <p data-zh="每一版结论都带误差预算一起报：误差多宽，话就只能说多满。最弱的那一格单独成行，不许被平均数盖住。">Every conclusion is reported together with its error budget: the wider the error, the less the claim may say. The weakest cell gets its own line and is never hidden inside an average.</p>
+  </div></details>
+  <details class="faq rv"><summary data-zh="失败库能看吗？">Can I see the failure library?</summary><div class="a">
+    <p data-zh="结论：能。失败库是这间屋子最先对外打开的部分之一——第七版那三页就是样张。">Yes. The failure library is among the first parts of this house to open — the three pages on Plate VII are specimens.</p>
+    <p data-zh="每页带日期、错因、归因到哪个器官。判词可以翻案，但要新证据加非作者复核，原页不删。">Each page carries a date, the cause, and the organ at fault. A verdict can be overturned, but only with new evidence and a non-author review — and the original page stays.</p>
+  </div></details>
+  <details class="faq rv"><summary data-zh="它和别人家的系统差在哪？">How is it different from other systems?</summary><div class="a">
+    <p data-zh="结论：别人能做的，我们也能做。差别在信息路数和判断方式。">What others can do, we can do. The difference is the number of information channels, and how judgement is made.</p>
+    <p data-zh="状态、订单流、波动、新闻因果，四路同时进来，互相验过才下判断。验不过，取最谨慎的答案。而且判断是活的：状态一变，上一秒的读数作废，当场重算。">State, order flow, volatility, and news causality arrive together and check each other before any judgement. If they disagree, the most careful answer wins. And the judgement stays alive: when the state changes, last second’s readings expire and everything is recomputed on the spot.</p>
+  </div></details>
+
+  <p class="faq-group rv">FOR INVESTORS · 投资人</p>
+  <details class="faq rv"><summary data-zh="为什么做个人级，不做机构级？">Why personal-scale, not institutional?</summary><div class="a">
+    <p data-zh="结论：因为限额按人算这件事，机构做不了——机构的限额是按账户和合规算的。">Because a limit computed per person is something an institution cannot do — institutional limits are computed per account and per compliance rule.</p>
+    <p data-zh="一个人的学费、房租、退路各不相同。把这些算进限额里，是这台机器从第一天就为个人造的原因。">One person’s tuition, rent, and way out differ from the next person’s. Computing those into the limit is why this machine was built for a person from day one.</p>
+  </div></details>
+  <details class="faq rv"><summary data-zh="意向名单之后是什么？">What comes after the intent list?</summary><div class="a">
+    <p data-zh="结论：逐封回复，先聊你最想算清的那个关于钱的问题，不群发、不路演。">Replies, one by one. First, a conversation about the one money question you most want measured — no blasts, no roadshow.</p>
+    <p data-zh="顺序按登记先后。聊完觉得不对路，随时停，没有后续打扰。">In registration order. If it is not a fit, it stops there, with no follow-up chasing.</p>
+  </div></details>
+
+  <p class="faq-group rv">FOR PARTNERS · 合作者</p>
+  <details class="faq rv"><summary data-zh="想合作，找谁、看什么？">I want to work together — who do I talk to, and what should I look at?</summary><div class="a">
+    <p data-zh="结论：找站主本人。登记时在身份里选合作者，再写下你想一起算的那件事。">The builder, personally. When you register, choose Partner, and write the thing you want to measure together.</p>
+    <p data-zh="先看三样：第七版的失败库、第三版的九条规矩、第六版的策略图。和这三样对不上脾气的合作，不必开始。">Look at three things first: the failure library on Plate VII, the nine rules on Plate III, and the strategy map on Plate VI. If those three do not sit right with you, the collaboration should not start.</p>
+  </div></details>
+</section>
+
+<!-- ============ IX · SIGN-OFF ============ -->
+<section class="plate" id="p9" data-title-en="PLATE IX · SIGN-OFF" data-title-zh="图版 IX · 签收">
+  <div class="plate-head rv"><span class="plate-no">TABULA IX · SIGN-OFF</span><h2 data-zh="签收。">Sign the sheet.</h2></div>
+  <p class="rv" style="--d:.08s" data-zh="留一个邮箱，这件事做出来的时候，叫你一声。就这一件事——不卖名单，不群发，随时退订。">Leave an email, and when this exists, you will be called. That is the whole of it — no list-selling, no blasts, unsubscribe any time.</p>
+
+  <form class="signoff rv" style="--d:.16s" id="intent-form" novalidate>
+    <div class="seal" id="seal" aria-live="polite">
+      <div class="stamp">✓<br>RECEIVED</div>
+      <div>
+        <div class="mono" id="seal-mail"></div>
+        <ul class="facts">
+          <li data-zh="站主本人联系">The builder writes personally</li>
+          <li data-zh="约每月一封">About one letter a month</li>
+          <li data-zh="随时一键退订">Unsubscribe in one click, any time</li>
+        </ul>
+      </div>
+    </div>
+    <div id="step1">
+      <label for="email" data-zh="邮箱 · EMAIL">EMAIL</label>
+      <div class="row">
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" aria-describedby="ferr">
+        <button class="btn-main" type="submit" id="submit-btn" data-zh="签收">Sign</button>
+      </div>
+      <div class="ferr" id="ferr" role="alert"></div>
+    </div>
+    <div class="step2" id="step2">
+      <label data-zh="你是谁 · WHO ARE YOU（可跳过）">WHO ARE YOU — OPTIONAL</label>
+      <div class="chips" id="chips">
+        <button type="button" class="chip" data-id="Curious" aria-pressed="false" data-zh="普通用户">Curious</button>
+        <button type="button" class="chip" data-id="Researcher" aria-pressed="false" data-zh="研究者">Researcher</button>
+        <button type="button" class="chip" data-id="Investor" aria-pressed="false" data-zh="投资人">Investor</button>
+        <button type="button" class="chip" data-id="Partner" aria-pressed="false" data-zh="合作者">Partner</button>
+        <button type="button" class="chip" id="skip-btn" data-zh="跳过">Skip</button>
+      </div>
+      <label for="question" data-zh="最想算清的一个关于钱的问题">THE ONE MONEY QUESTION YOU MOST WANT MEASURED</label>
+      <textarea class="q" id="question" name="question" placeholder="…"></textarea>
+      <div style="margin-top:12px"><button class="btn" type="button" id="save-btn" data-zh="保存">Save</button></div>
+      <div class="ferr" id="ferr2" role="alert"></div>
+      <div class="noted" id="noted">Noted. <span class="check">✓</span></div>
+    </div>
+  </form>
+</section>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span>NAUTILUS · TABULAE I–IX</span>
+    <span data-zh="图上的每个数都有出处；量不到的，留白。">Every number on these plates carries its source; what cannot be measured is left blank.</span>
+    <span>FIG. IX · END OF SHEET</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,c){return (c||document).querySelector(s)};
+var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+/* ---------- language: EN first visit, remember choice ---------- */
+var lang=store('nautilus_lang')||'en';
+$$('[data-zh]').forEach(function(el){el.setAttribute('data-en',el.innerHTML)});
+function setLang(l){
+  lang=l; store('nautilus_lang',l);
+  $$('[data-zh]').forEach(function(el){el.innerHTML = l==='zh'? el.getAttribute('data-zh') : el.getAttribute('data-en')});
+  $('#lang-en').setAttribute('aria-pressed', l==='en'?'true':'false');
+  $('#lang-zh').setAttribute('aria-pressed', l==='zh'?'true':'false');
+  document.documentElement.lang = l==='zh'?'zh-CN':'en';
+  updatePbLabel();
+}
+$('#lang-en').addEventListener('click',function(){setLang('en')});
+$('#lang-zh').addEventListener('click',function(){setLang('zh')});
+
+/* ---------- stepwise reveal, once ---------- */
+var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduced || !('IntersectionObserver' in window)){ $$('.plate').forEach(function(p){p.classList.add('in')}); $$('.rv').forEach(function(e){e.classList.add('in')}); }
+else{
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in'); io.unobserve(en.target)}})},{threshold:.02, rootMargin:'900px 0px 900px 0px'});
+  $$('.plate').forEach(function(p){io.observe(p)});
+  /* failsafe: content must never stay hidden (full-page captures, odd scroll paths) */
+  setTimeout(function(){ $$('.plate').forEach(function(p){p.classList.add('in')}); $$('.rv').forEach(function(e){e.classList.add('in')}); }, 5000);
+}
+
+/* ---------- scrollspy + progress ---------- */
+var plates=$$('.plate'); var cur='p1';
+function updatePbLabel(){var p=$('#'+cur); if(!p)return; $('#pb-label').textContent = lang==='zh'? (p.getAttribute('data-title-zh')||'') : (p.getAttribute('data-title-en')||'');}
+var so=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){cur=en.target.id;
+  $$('[data-nav]').forEach(function(a){a.setAttribute('aria-current', a.getAttribute('data-nav')===cur?'true':'false')});
+  updatePbLabel();}})},{rootMargin:'-40% 0px -55% 0px'});
+plates.forEach(function(p){so.observe(p)});
+window.addEventListener('scroll',function(){
+  var h=document.documentElement; var max=h.scrollHeight-h.clientHeight;
+  $('#pb-fill').style.width=(max>0? (h.scrollTop/max*100):0)+'%';
+},{passive:true});
+
+/* ---------- figure <-> text highlighting ---------- */
+var fig=$('#shellfig');
+function light(part,on){
+  if(!fig)return;
+  fig.classList.toggle('dim',on);
+  $$('[data-part]',fig).forEach(function(g){g.classList.toggle('lit', on && g.getAttribute('data-part')===part)});
+  $$('.hl').forEach(function(h){h.classList.toggle('lit', on && h.getAttribute('data-part')===part)});
+}
+var locked=null;
+document.addEventListener('mouseover',function(e){ var h=e.target.closest? e.target.closest('.hl'):null; if(h) light(h.getAttribute('data-part'),true); });
+document.addEventListener('mouseout',function(e){ var h=e.target.closest? e.target.closest('.hl'):null; if(h){ if(locked) light(locked,true); else light(h.getAttribute('data-part'),false); } });
+document.addEventListener('click',function(e){ var h=e.target.closest? e.target.closest('.hl'):null; if(!h)return; var part=h.getAttribute('data-part'); locked = locked===part? null: part; if(locked) light(locked,true); else light(part,false); });
+if(fig){ $$('[data-part]',fig).forEach(function(g){
+  g.addEventListener('mouseenter',function(){light(g.getAttribute('data-part'),true)});
+  g.addEventListener('mouseleave',function(){if(!locked)light(g.getAttribute('data-part'),false)});
+});}
+
+/* ---------- glossary: 22 terms ---------- */
+var GLOSS={
+"ingestion":["Ingestion","数据入境 — every source is received, checked, and registered before anything reads it.","一切来源先收件、校验、登记，之后才许被读取。"],
+"timestamping":["Timestamping","双时间戳 — each item carries the time it happened and the time it arrived; a reading without both is not a reading.","每条信息带事件时间与接收时间两个戳；缺一个，不算读数。"],
+"regime identification":["Regime identification","状态识别 — naming which market state this second belongs to, before any strategy is chosen.","先判这一秒属于哪种市场状态，再谈选哪件策略。"],
+"order flow":["Order flow","订单流 — who is actually buying and selling, in what size, right now; the ear’s raw material.","这一刻真实的买卖单与量，是耳朵的原料。"],
+"microstructure":["Microstructure","微观结构 — the mechanics of the book itself: spreads, depth, queue position.","盘口本身的力学：价差、深度、排队位置。"],
+"volatility regime":["Volatility regime","波动状态 — whether this second’s swings are calm, normal, or violent, by measured class.","这一秒的波动属平静、常态还是剧烈，按实测分级。"],
+"venue calibration":["Venue calibration","场地校准 — the same thermometer reads differently on different venues; each is calibrated separately.","同一支温度计在不同场地读数不同，逐场地校准。"],
+"event causality":["Event causality","事件因果 — tracing which event caused this change in the weather, not just that the weather changed.","追天气为什么变：哪个事件引起的，不只是知道变了。"],
+"rumour discounting":["Rumour discounting","传闻折价 — unverified claims enter at a discount, stamped suspect, until a second channel confirms them.","未验消息先打折入境、标疑，等第二路信息确认。"],
+"latency budget":["Latency budget","延迟预算 — how much of the time between state-judged and hound-ready is spent, and where.","从状态判出到猎犬待发，时间花在哪、花了多少，有预算表。"],
+"position sizing":["Position sizing","仓位定量 — how large a seat at this table, computed from the limit, never from confidence.","坐多大的位置，由限额算，不由信心算。"],
+"per-person risk limit":["Per-person risk limit","按人限额 — the limit is derived from one person’s real life: tuition, rent, the way out.","限额按这个人的真实生活推：学费、房租、退路都在里面。"],
+"ray constraint":["Ray constraint","ray 约束 — the hard outer boundary on total allocation; beyond the ray, no argument is heard.","总分配的硬外边界；ray 之外，不听任何理由。"],
+"failure attribution":["Failure attribution","失败归因 — each failure is booked to the organ and step that caused it, with a date.","每次失败归到出事的器官与步骤，带日期入册。"],
+"ceiling derivation":["Ceiling derivation","天花板推导 — the best possible result, derived downward from information, mathematics, and physics.","最好能做到多好，从信息、数学、物理三处往下推。"],
+"error budget":["Error budget","误差预算 — how wrong each reading may be, totalled honestly; the claim may not exceed it.","每个读数可能错多少，诚实汇总；结论不许超出它。"],
+"weakest-cell reporting":["Weakest-cell reporting","最弱格报告 — results are reported by their weakest cell, printed before any average.","成绩按最弱的那一格报，排在平均数前面。"],
+"information limit":["Information limit","信息极限 — no judgement can know more than the information that has actually arrived.","判断知道的，不可能多于真正到达的信息。"],
+"mathematical limit":["Mathematical limit","数学极限 — what the structure of the problem itself forbids, however fast the machine.","问题结构本身禁止的事，机器再快也不行。"],
+"physical limit":["Physical limit","物理极限 — light, distance, and hardware: the floor under every latency number.","光速、距离、硬件——一切延迟数字的地板。"],
+"state estimation":["State estimation","状态估计 — the market’s state is never seen directly; it is estimated, with an error attached.","市场状态从不直接可见，只能估计，且带误差。"],
+"cross-validation":["Cross-validation","交叉验证 — independent channels must agree before a judgement is allowed to stand.","独立的几路信息互相对上，判断才许成立。"]
+};
+var openNote=null;
+$$('.term').forEach(function(b){
+  b.addEventListener('click',function(){
+    var key=b.getAttribute('data-term'); var g=GLOSS[key]; if(!g)return;
+    if(openNote){openNote.remove(); openNote=null;}
+    var host=b.closest('p')||b.parentNode;
+    var note=document.createElement('div'); note.className='term-note';
+    note.innerHTML='<span class="tt"></span><span class="tx"></span>';
+    note.querySelector('.tt').textContent=g[0].toUpperCase();
+    note.querySelector('.tx').textContent= lang==='zh'? g[2]: g[1];
+    host.parentNode.insertBefore(note, host.nextSibling);
+    openNote=note;
+  });
+});
+
+/* ---------- map tags open their source cards ---------- */
+$$('.maptag').forEach(function(t){
+  t.addEventListener('click',function(){
+    var d=document.getElementById(t.getAttribute('data-src')); if(!d)return;
+    d.open=true; d.scrollIntoView({behavior:reduced?'auto':'smooth', block:'center'});
+  });
+});
+
+/* ---------- FAQ expand all ---------- */
+var faqBtn=$('#faq-all'), faqOpen=false;
+faqBtn.addEventListener('click',function(){
+  faqOpen=!faqOpen;
+  $$('details.faq').forEach(function(d){d.open=faqOpen});
+  faqBtn.textContent = faqOpen? (lang==='zh'?'全部收起':'Collapse all') : (lang==='zh'?'全部展开':'Expand all');
+});
+
+/* ---------- sign-off form: FormSubmit AJAX, no fake success ---------- */
+var ENDPOINT='https://formsubmit.co/ajax/huanian.jin@outlook.com';
+var emailEl=$('#email'), ferr=$('#ferr'), ferr2=$('#ferr2');
+var registeredEmail='', identity='';
+var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function err(el,msg){el.textContent=msg||''}
+function alreadyList(){ try{return JSON.parse(store('nautilus_registered')||'[]')}catch(e){return[]} }
+emailEl.addEventListener('blur',function(){
+  var v=emailEl.value.trim();
+  if(v && !EMAIL_RE.test(v)) err(ferr, lang==='zh'?'这个邮箱写得不对，检查一下再签。':'That email does not look right — check it and try again.');
+});
+emailEl.addEventListener('input',function(){ if(EMAIL_RE.test(emailEl.value.trim())) err(ferr,''); });
+function post(payload){
+  return fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)})
+    .then(function(r){ if(!r.ok) throw new Error('bad status'); return r.json().catch(function(){return{}}) })
+    .then(function(d){ if(d && (d.success===false || d.success==='false')){ var e=new Error(d.message||'rejected'); e.fsMessage=d.message||''; throw e; } return d; });
+}
+$('#intent-form').addEventListener('submit',function(ev){
+  ev.preventDefault(); err(ferr,'');
+  var v=emailEl.value.trim().toLowerCase();
+  if(!EMAIL_RE.test(v)){ err(ferr, lang==='zh'?'先写一个写得对的邮箱。':'Enter a valid email first.'); emailEl.focus(); return; }
+  if(alreadyList().indexOf(v)>=0){
+    err(ferr, lang==='zh'?'这个邮箱已经签收过了——站主会联系你，不用再签一次。':'This email is already registered — the builder will write to you; no need to sign twice.');
+    return;
+  }
+  var btn=$('#submit-btn'); btn.disabled=true; btn.textContent=lang==='zh'?'投递中…':'Sending…';
+  post({email:v, identity:'', question:'', _subject:'Nautilus — new intent registration', _template:'table'})
+    .then(function(){
+      registeredEmail=v;
+      var list=alreadyList(); list.push(v); store('nautilus_registered', JSON.stringify(list));
+      $('#seal-mail').textContent=v;
+      $('#seal').style.display='flex';
+      $('#step1').style.display='none';
+      $('#step2').style.display='block';
+    })
+    .catch(function(e){
+      if(e && e.fsMessage && /activat/i.test(e.fsMessage)){
+        err(ferr, lang==='zh'?'收件端还没激活：站主邮箱里有一封 FormSubmit 激活信，点里面的 Activate Form 之后再签一次。你的邮箱尚未被记下。':'The inbox end is not activated yet: FormSubmit has sent an activation email — after it is activated, sign once more. Your email has not been recorded.');
+      } else {
+        err(ferr, lang==='zh'?'这次没投递成功——网络或收件端出了问题。你的邮箱没有被记下，点签收重试。':'Delivery failed — a network or inbox problem. Your email was not recorded; press Sign to retry.');
+      }
+    })
+    .finally(function(){ btn.disabled=false; btn.textContent= lang==='zh'?'签收':'Sign'; });
+});
+$$('#chips .chip[data-id]').forEach(function(c){
+  c.addEventListener('click',function(){
+    $$('#chips .chip').forEach(function(x){x.setAttribute('aria-pressed','false')});
+    c.setAttribute('aria-pressed','true'); identity=c.getAttribute('data-id');
+  });
+});
+$('#skip-btn').addEventListener('click',function(){
+  $$('#chips .chip').forEach(function(x){x.setAttribute('aria-pressed','false')}); identity='';
+});
+$('#save-btn').addEventListener('click',function(){
+  err(ferr2,'');
+  var q=$('#question').value.trim();
+  post({email:registeredEmail, identity:identity, question:q, _subject:'Nautilus — intent details', _template:'table'})
+    .then(function(){ $('#noted').style.display='block'; })
+    .catch(function(){ err(ferr2, lang==='zh'?'没存上，再点一次保存。':'That did not save — press Save once more.'); });
+});
+
+/* initial language */
+setLang(lang);
+})();
+</script>
+</body>
+</html>
