@@ -109,6 +109,8 @@ figure{margin:0}
 /* film */
 .film-frame{border:2px solid var(--line); aspect-ratio:16/8.2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:20px; position:relative}
 .film-frame .play{width:64px; height:64px; border:1.5px solid var(--line); border-radius:50%; display:flex; align-items:center; justify-content:center; background:transparent; cursor:default}
+.film-frame.film-live{padding:0}
+.film-frame.film-live iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 .chapters{list-style:none; margin:18px 0 0; padding:0; counter-reset:ch}
 .chapters li{border-top:1px solid var(--line-soft); padding:10px 2px; display:flex; gap:14px; align-items:baseline}
 .chapters .n{font-family:var(--mono); font-size:12px; color:var(--ochre)}
@@ -277,21 +279,22 @@ footer{border-top:2px solid var(--line); margin-top:20px}
 <!-- ============ II · THE FILM ============ -->
 <section class="plate" id="p2" data-title-en="PLATE II · THE FILM" data-title-zh="图版 II · 影片">
   <div class="plate-head rv"><span class="plate-no">TABULA II</span><h2 data-zh="先看片子。">Watch first.</h2></div>
-  <p class="rv" style="--d:.1s" data-zh="三分钟多。片子讲完这间屋子怎么量、为什么量到极限，剩下的图版再逐条对账。">A little over three minutes. The film shows how this house measures, and why it measures to the limit; the plates after it keep the receipts.</p>
+  <p class="rv" style="--d:.1s" data-zh="四分半不到。片子讲完这间屋子怎么量、为什么量到极限，剩下的图版再逐条对账。">A little under four and a half minutes. The film shows how this house measures, and why it measures to the limit; the plates after it keep the receipts.</p>
   <figure class="rv" style="--d:.2s">
-    <div class="film-frame" role="img" aria-label="Film poster frame — the film will be embedded here">
-      <div class="play" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M6 3 L19 11 L6 19 Z" fill="#2c2115"/></svg></div>
-      <div class="mono" data-zh="成片即将嵌入此框">THE FILM ARRIVES IN THIS FRAME</div>
-      <div class="small" data-zh="不自动播放。点开才放，声音也是。">Nothing autoplays. Press play, and only then.</div>
+    <div class="film-frame film-live" id="filmFrameYt">
+      <iframe src="https://www.youtube-nocookie.com/embed/4K3kIGqZI98" title="Nautilus — First, Measure the Limit | D2O Capital" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <div class="film-frame film-live" id="filmFrameZh" style="display:none">
+      <iframe src="https://player.bilibili.com/player.html?bvid=BV1jDykz5Ec5&page=1&high_quality=1&danmaku=0" title="Nautilus：先量极限，再谈市场" allowfullscreen loading="lazy"></iframe>
     </div>
     <figcaption class="figcap"><span>FIG. II-A — FILM FRAME</span><span>16 : 9</span></figcaption>
   </figure>
   <ol class="chapters rv" style="--d:.3s">
     <li><span class="n">01</span><span data-zh="那道被划掉的题">The crossed-out question</span><span class="t">0:00</span></li>
-    <li><span class="n">02</span><span data-zh="鹦鹉螺的房间">The nautilus’s rooms</span><span class="t">0:41</span></li>
-    <li><span class="n">03</span><span data-zh="它怎么量">How it measures</span><span class="t">1:28</span></li>
-    <li><span class="n">04</span><span data-zh="为什么是极限">Why the limit</span><span class="t">2:20</span></li>
-    <li><span class="n">05</span><span data-zh="它绝不做的事">What it will never do</span><span class="t">3:02</span></li>
+    <li><span class="n">02</span><span data-zh="鹦鹉螺的房间">The nautilus’s rooms</span><span class="t">0:38</span></li>
+    <li><span class="n">03</span><span data-zh="它怎么量">How it measures</span><span class="t">0:48</span></li>
+    <li><span class="n">04</span><span data-zh="为什么是极限">Why the limit</span><span class="t">1:43</span></li>
+    <li><span class="n">05</span><span data-zh="它绝不做的事">What it will never do</span><span class="t">3:08</span></li>
   </ol>
 </section>
 
@@ -779,6 +782,21 @@ $('#save-btn').addEventListener('click',function(){
 
 /* initial language */
 setLang(lang);
+})();
+</script>
+<script>
+/* film frame: EN plays the YouTube edition, ZH plays the Bilibili edition. */
+(function(){
+  var yt=document.getElementById('filmFrameYt'), zh=document.getElementById('filmFrameZh');
+  if(!yt||!zh) return;
+  function sync(){
+    var isZh=document.getElementById('lang-zh').getAttribute('aria-pressed')==='true';
+    yt.style.display = isZh ? 'none' : '';
+    zh.style.display = isZh ? '' : 'none';
+  }
+  document.getElementById('lang-en').addEventListener('click',function(){setTimeout(sync,0)});
+  document.getElementById('lang-zh').addEventListener('click',function(){setTimeout(sync,0)});
+  sync();
 })();
 </script>
 </body>
